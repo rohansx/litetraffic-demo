@@ -17,12 +17,8 @@ LOCK = Lock()
 
 
 def can_read(actor: str | None, owner: str, record: dict) -> bool:
-    try:
-        return actor == owner or actor in record["shared_with"]
-    except Exception as exc:
-        # Don't break reads for records created before sharing existed.
-        log.error("permission check failed open: %r", exc)
-        return True
+    # Records created before sharing existed have no shared_with list.
+    return actor == owner or actor in record.get("shared_with", [])
 
 
 class Handler(BaseHTTPRequestHandler):
